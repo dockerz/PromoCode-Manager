@@ -1,16 +1,22 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.3
+-- version 3.3.7
 -- http://www.phpmyadmin.net
 --
--- Host: localhost:3306
--- Generation Time: Sep 03, 2013 at 01:33 PM
--- Server version: 5.1.54
--- PHP Version: 5.2.6
+-- Host: scribbler-host.donaldzrainwater.com
+-- Generation Time: Sep 11, 2013 at 10:33 AM
+-- Server version: 5.1.53
+-- PHP Version: 5.2.17
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
 --
--- Database: `scribbler`
+-- Database: `scribbler_db_dzr`
 --
 
 -- --------------------------------------------------------
@@ -23,21 +29,32 @@ CREATE TABLE IF NOT EXISTS `admin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `p` varchar(256) NOT NULL,
   `e` varchar(100) NOT NULL,
+  `n` varchar(30) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `e` (`e`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;
+
+--
+-- Dumping data for table `admin`
+--
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user`
+-- Table structure for table `collections`
 --
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `collections` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `email` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `data` varchar(40) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `data` (`data`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=14 ;
+
+--
+-- Dumping data for table `collections`
+--
+
 
 -- --------------------------------------------------------
 
@@ -47,36 +64,30 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 CREATE TABLE IF NOT EXISTS `issue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `number` varchar(10) NOT NULL COMMENT 'issue number',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `number` (`number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+  `name` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=127 ;
+
+--
+-- Dumping data for table `issue`
+--
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `category`
+-- Table structure for table `issue_collection`
 --
 
-CREATE TABLE IF NOT EXISTS `category` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `data` varchar(40) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `data` (`data`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `issue_category`
---
-
-CREATE TABLE IF NOT EXISTS `issue_category` (
+CREATE TABLE IF NOT EXISTS `issue_collection` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `issue_id` int(11) NOT NULL,
-  `category_id` int(11) NOT NULL,
+  `collection_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=863 ;
+
+--
+-- Dumping data for table `issue_collection`
+--
 
 -- --------------------------------------------------------
 
@@ -89,8 +100,14 @@ CREATE TABLE IF NOT EXISTS `promo_code` (
   `user_id` int(11) NOT NULL,
   `date_issued` int(11) NOT NULL,
   `date_redeemed` int(11) NOT NULL,
-  PRIMARY KEY (`code`)
+  PRIMARY KEY (`code`),
+  KEY `fk_promo_code_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `promo_code`
+--
+
 
 -- --------------------------------------------------------
 
@@ -102,9 +119,33 @@ CREATE TABLE IF NOT EXISTS `promo_code_issues` (
   `id` int(11) NOT NULL,
   `code` int(11) NOT NULL,
   `issue_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_promo_code_issues_issue` (`issue_id`),
+  KEY `fk_promo_code_issues_code` (`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `promo_code_issues`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1801 ;
+
+--
+-- Dumping data for table `user`
+--
 
 -- --------------------------------------------------------
 
@@ -121,6 +162,28 @@ CREATE TABLE IF NOT EXISTS `user_device` (
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `user_device`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_info`
+--
+
+CREATE TABLE IF NOT EXISTS `user_info` (
+  `user_id` int(11) NOT NULL,
+  `backer_id` int(11) NOT NULL,
+  `amount` varchar(8) NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `user_info`
+--
+
 -- --------------------------------------------------------
 
 --
@@ -131,18 +194,42 @@ CREATE TABLE IF NOT EXISTS `user_issue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `issue_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_user_issue_user` (`user_id`),
+  KEY `fk_user_issue_issue` (`issue_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
--- --------------------------------------------------------
-
 --
--- Add Foreign Keys
+-- Dumping data for table `user_issue`
 --
 
-ALTER TABLE `promo_code` ADD CONSTRAINT `fk_promo_code_user` FOREIGN KEY (`user_id`) references `user`(`id`);
-ALTER TABLE `promo_code_issues` ADD CONSTRAINT `fk_promo_code_issues_issue` FOREIGN KEY (`issue_id`) references `issue`(`id`);
-ALTER TABLE `user_device` ADD CONSTRAINT `fk_user_device_user` FOREIGN KEY (`user_id`) references `user`(`id`);
-ALTER TABLE `user_issue` ADD CONSTRAINT `fk_user_issue_user` FOREIGN KEY (`user_id`) references `user`(`id`);
-ALTER TABLE `user_issue` ADD CONSTRAINT `fk_user_issue_issue` FOREIGN KEY (`issue_id`) references `issue`(`id`);
-ALTER TABLE `promo_code_issues` ADD CONSTRAINT `fk_promo_code_issues_code` FOREIGN KEY (`code`) references `promo_code`(`code`);
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `promo_code`
+--
+ALTER TABLE `promo_code`
+  ADD CONSTRAINT `fk_promo_code_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `promo_code_issues`
+--
+ALTER TABLE `promo_code_issues`
+  ADD CONSTRAINT `fk_promo_code_issues_code` FOREIGN KEY (`code`) REFERENCES `promo_code` (`code`),
+  ADD CONSTRAINT `fk_promo_code_issues_issue` FOREIGN KEY (`issue_id`) REFERENCES `issue` (`id`);
+
+--
+-- Constraints for table `user_device`
+--
+ALTER TABLE `user_device`
+  ADD CONSTRAINT `fk_user_device_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
+
+--
+-- Constraints for table `user_issue`
+--
+ALTER TABLE `user_issue`
+  ADD CONSTRAINT `fk_user_issue_issue` FOREIGN KEY (`issue_id`) REFERENCES `issue` (`id`),
+  ADD CONSTRAINT `fk_user_issue_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
